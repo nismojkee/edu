@@ -50,7 +50,7 @@ class reviewer(models.Model):
 	name = models.CharField(max_length = 200, help_text = 'reviewer name', verbose_name = 'Reviewer name:')
 	email = models.EmailField(max_length = 254, help_text = 'reviewer email', verbose_name = 'Reviewer email:')
 	review = models.TextField(help_text = 'reviewer message', verbose_name = 'Reviewer message:')
-	stars = models.PositiveSmallIntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)], help_text = 'reviewer rating', verbose_name = 'Reviewer rating')
+	stars = models.PositiveSmallIntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)], help_text = 'reviewer rating', verbose_name = 'Reviewer rating', null = True, blank = True)
 	created = models.DateTimeField(default = timezone.now)
 
 	def publish(self):

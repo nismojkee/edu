@@ -1,11 +1,44 @@
+{% extends 'layout.html' %}
+
 {% block content %}
+
+{% include 'page-header.html' with page='review' %}
 <main class="container-fluid">
 	<!-- reviews -->
 	<section class="row py-5">
 		<div class="container">
-			<div class="row">
-				<div class="col"></div>
+			{% if reviews %}
+			{% for review in reviews %}
+			<div class="row my-2 {% cycle 'rgba-grey-slight' 'white' %} py-2">
+				<div class="col-12">
+					<div class="media">
+						<img src="../media/{{review.photo}}" alt="{{review.name}}" class="review-photo mr-3">
+						<div class="media-body">
+							<h5 class="my-0 font-weight-bold text-capitalize">
+								{{review.name}}
+							</h5>
+							<p class="my-0">
+								<i class="fa fa-envelope text-muted"></i>
+								<a href="mailto:{{review.email}}" class="blue-grey-text small">{{review.email}}</a>
+							</p>
+							<p class="my-0 small text-black-50">
+								{{review.created|date:"d F Y"}}
+							</p>
+						    <p class="my-3">
+						    	{{review.review}}
+						    </p>
+						</div>
+					</div>
+				</div>
 			</div>
+			{% endfor %}
+			{% else %}
+			<div class="row">
+				<div class="col">
+					Reviews not found. Be first!
+				</div>
+			</div>
+			{% endif %}
 		</div>
 	</section>
 
@@ -13,13 +46,77 @@
 	<section class="row py-5">
 		<div class="container">
 			<div class="row">
-				<div class="col">
-					<form action="" class="w-responsive mx-auto p-3 z-depth-1-half rounded">
-						
+				<div class="col-12 col-md-11 col-lg-9 mx-auto">
+					<form action="{% url 'review_leave' %}" method="POST" class="w-responsive mx-auto px-3 py-5 z-depth-1 border text-center" enctype="multipart/form-data">
+						{% csrf_token %}
+
+						<div class="md-form w-responsive mx-auto my-3 text-left">
+					        <i class="fa fa-user prefix grey-text"></i>
+					        <input type="text" name="reviewer_name" id="reviewer_name" class="form-control form-control-sm" required>
+					        <label for="reviewer_name">Your name <sup><span class="text-danger">*</span></sup></label>
+				      	</div>
+
+						<div class="md-form w-responsive mx-auto my-3 text-left">
+					        <i class="fas fa-envelope prefix grey-text"></i>
+					        <input type="email" name="reviewer_mail" id="reviewer_mail" class="form-control form-control-sm" required>
+					        <label for="reviewer_mail">Your email <sup><span class="text-danger">*</span></sup></label>
+				      	</div>
+
+				      	<div class="md-form w-responsive mx-auto my-3 text-left">
+					        <i class="fa fa-phone fa-flip-horizontal prefix grey-text"></i>
+					        <input type="tel" name="reviewer_phone" id="reviewer_phone" class="form-control form-control-sm" required>
+					        <label for="reviewer_phone">Your phone <sup><span class="text-danger">*</span></sup></label>
+				      	</div>
+
+				      	<div class="md-form w-responsive mx-auto mt-4 mb-3 text-left">
+					        <i class="fas fa-pencil-alt prefix grey-text"></i>
+					        <textarea id="reviewer_message" name="reviewer_message" class="md-textarea form-control form-control-sm" rows="4" required></textarea>
+					        <label for="reviewer_message">Your message <sup><span class="text-danger">*</span></sup></label>
+		    	  		</div>
+
+		    	  		<div class="input-group w-responsive mx-auto my-3">
+		    	  			<input type="file" class="btn inputfile" name="files[]" required id="files" aria-describedby="inputGroupFileAddon01" accept="image/jpeg,image/png,image/gif">
+		    	  			<label class="btn grey-text btn-block z-depth-0 border border-grey" for="files" id="file_label">
+		    	  				<i class="fa fa-cloud-upload-alt"></i> Upload photo <sup><span class="text-danger">*</span></sup>
+		    	  			</label>
+		    	  		</div>
+
+		    	  		<div class="custom-control custom-checkbox w-responsive mx-auto my-3 text-justify text-lg-center">
+		    	  		    <input type="checkbox" class="custom-control-input" id="reviewer_accept" required>
+		    	  		    <label class="custom-control-label text-muted" for="reviewer_accept">
+		    	  		    	I agree with сonsent to the collection and processing of personal data
+		    	  		    </label>
+		    	  		</div>
+
+		    	  		<button type="submit" class="btn btn-grey rounded-0">
+		    	  			Leave your message
+		    	  		</button>
 					</form>
 				</div>
 			</div>
 		</div>
 	</section>
 </main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  	function handleFileSelect(evt) {
+    	var files = evt.target.files;
+    	for (var i = 0, f; f = files[i]; i++) {
+      		if (!f.type.match('image.*')) {
+        		continue;
+      		}
+      		var reader = new FileReader();
+      		reader.onload = (function(theFile) {
+        	return function(e) {
+          		document.getElementById('file_label').innerHTML = escape(theFile.name);
+        	};
+      	})(f);
+      	
+      	reader.readAsDataURL(f);
+    	}
+  	}
+  	document.getElementById('files').addEventListener('change', handleFileSelect, false);
+</script>
 {% endblock %}
